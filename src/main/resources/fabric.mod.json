@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "npscript",
+  "version": "${version}",
+  "name": "BlockSkript",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "repo": "https://github.com/NerjalNosk/npscript"
+  },
+  "license": "GPL-3.0",
+  "icon": "assets/npscript/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "io.nerjalnosk.npscript.client.BlockSkriptClient"
+    ],
+    "main": [
+      "io.nerjalnosk.npscript.BlockSkript"
+    ]
+  },
+  "mixins": [
+    "npscript.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "${minecraft_version}"
+  }
+}
