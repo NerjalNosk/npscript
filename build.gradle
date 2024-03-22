@@ -39,6 +39,7 @@ tasks.withType(JavaCompile).configureEach {
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
         it.options.release.set(targetJavaVersion)
     }
+    it.dependsOn generateGrammarSource
 }
 
 java {
@@ -52,6 +53,14 @@ java {
 generateGrammarSource {
     maxHeapSize = "256m"
     arguments += ["-visitor", "-long-messages"]
+    doLast {
+        println("Moving generated parser sources");
+        copy {
+            from outputDirectory
+            into "src/main/java"
+        }
+        outputDirectory.deleteDir()
+    }
 }
 
 jar {
