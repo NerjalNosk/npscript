@@ -53,11 +53,40 @@ java {
 generateGrammarSource {
     maxHeapSize = "256m"
     arguments += ["-visitor", "-long-messages"]
+    doFirst {
+        println("Clearing remaining generated sources")
+        File srcFile = sourceSets.named("main").get().antlr.srcDirs.first();
+        FileTree srcTree = sourceSets.named("main").get().antlr.asFileTree;
+        srcTree.matching { include "**/*.g4" }.each {
+            def packPath = srcFile.relativePath(it.parentFile)
+            def javaDir = new File(sourceSets.named("main").get().java.srcDirs.first(), packPath)
+            def resDir = new File(sourceSets.named("main").get().resources.srcDirs.first(), packPath)
+            if (javaDir.exists()) javaDir.listFiles().each { f->
+                if (f.exists() && f.name != ".gitignore") f.directory ? f.deleteDir() : f.delete()
+            }
+            if (resDir.exists()) resDir.listFiles().each { f->
+                if (f.exists() && f.name != ".gitignore") f.directory ? f.deleteDir() : f.delete()
+            }
+        }
+    }
     doLast {
-        println("Moving generated parser sources");
-        copy {
-            from outputDirectory
-            into "src/main/java"
+        println("Moving generated parser sources")
+        File srcFile = sourceSets.named("main").get().antlr.srcDirs.first();
+        FileTree srcTree = sourceSets.named("main").get().antlr.asFileTree;
+        srcTree.matching { include "**/*.g4" }.each {
+            def packPath = srcFile.relativePath(it.parentFile)
+            def javaDir = new File(sourceSets.named("main").get().java.srcDirs.first(), packPath)
+            def resDir = new File(sourceSets.named("main").get().resources.srcDirs.first(), packPath)
+            def genDir = new File(outputDirectory, packPath)
+            javaDir.mkdirs()
+            resDir.mkdirs()
+            genDir.listFiles().each {f ->
+                def target = (f.name.endsWith(".java")) ? javaDir : resDir
+                copy {
+                    from f
+                    into target
+                }
+            }
         }
         outputDirectory.deleteDir()
     }
